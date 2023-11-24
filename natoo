@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+from subprocess import run
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Network analysis tool')
+
+parser.add_argument('-H', action='store_true', help='Host discovery')
+parser.add_argument('-P', action='store_true', help='Port scanner')
+parser.add_argument('-Dp', action='store', metavar='PORT', type=int, help='OS detection')
+parser.add_argument('-Sn', action='store', metavar='NUM', required=False, type=int, help='Packet sniffing')
+parser.add_argument('-A', action='store_true', help='ARP poisoning')
+parser.add_argument('ip', help='IP address', nargs='?')
+parser.add_argument('-i', '--interface', required=False, help='Interface', nargs='?')
+parser.add_argument('-m', '--mac-addr', required=False, help='MAC address', nargs='?')
+
+args = parser.parse_args()
+
+if args.P:
+    run(f'./port_scanner {args.ip} 2', shell=True)
+elif args.H:
+    run(f'./host_scan {args.ip}', shell=True)
+elif args.Dp:
+    run(f'sudo ./os_det {args.ip} {args.Dp}', shell=True)
+elif args.Sn:
+    run(f'sudo ./packet_sniffer -n {args.Sn} {f"-i {args.interface}" if args.interface else ""}', shell=True)
+elif args.A:
+    run(f'sudo ./arp_poisoner {args.interface} {args.ip} {args.mac_addr}', shell=True)
+else:
+    raise NotImplementedError
